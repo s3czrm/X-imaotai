@@ -9,7 +9,7 @@
 hostname = hj*.com,*.haijiao.com
 
 [rewrite_local]
-(?i)^https:\/\/([a-zA-Z0-9]+\.haijiao\.com|hj[a-zA-Z0-9]+\.com)\/api\/topic\/(\d+)$ url script-response-body hj.js
+(?i)^https:\/\/([a-zA-Z0-9]+\.haijiao\.com|hj[a-zA-Z0-9]+\.com)\/api\/topic\/(\d+)$ url script-response-body https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/haijiao.js
 
 ******************************************/
 
