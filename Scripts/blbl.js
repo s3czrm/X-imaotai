@@ -14,6 +14,8 @@ hostname = app.bilibili.com
 ^https?:\/\/app\.bilibili\.com\/x\/v2\/account\/myinfo\? url script-response-body https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/blbl.js
 
 ******************************************/
-let body = $response.body;
-/https?:\/\/app\.bilibili\.com\/x\/v2\/account\/myinfo\?/.test($request.url) && ((body = JSON.parse(body), !parsedJSON.data.vip.status && (parsedJSON.data.vip.type = 2, parsedJSON.data.vip.status = 1, parsedJSON.data.vip.vip_pay_type = 1, parsedJSON.data.vip.due_date = 4087999199000), body = JSON.stringify(parsedJSON)));
-$done({ body });
+let body = JSON.parse($response.body);
+
+!body.data.vip.status && (body.data.vip.type = 2, body.data.vip.status = 1, body.data.vip.vip_pay_type = 1, body.data.vip.due_date = 4087999199000);
+
+$done({ body: JSON.stringify(body) });
