@@ -14,40 +14,11 @@ hostname = *.caiyunapp.*,*cyapi*
 ^http[s]?:\/\/biz\.(caiyunapp|cyapi)\.(com|cn)\/v2\/user.*$ url script-response-body https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/caiyun.js
 
 ******************************************/
-let body = JSON.parse($response.body)
-body
-    .result = {
-    ...body.result,
-    'xy_vip_expire': 0,
-    'vip_expired_at': 0,
-    'auto_renewal_type': '',
-    'third_party_id': null,
-    'svip_expired_at': 32494698549.41677,
-    'is_xy_vip': true,
-    'xy_svip_expire': 2061894341,
-    'is_xy_auto_renewal': false,
-    'is_primary': true,
-    'free_trial': 0,
-    'vip_type': 's',
-    'is_phone_verified': true,
-    'wt': {
-        ...body.result.wt,
-        'vip': {
-            'enabled': true,
-            'is_auto_renewal': false,
-            'auto_renewal_type': '',
-            'svip_auto_renewal_type': '',
-            'svip_expired_at': 32493834549000.418,
-            'expired_at': 0
-        },
-        'svip_given': 365,
-    },
-    'bound_status': {
-        ...body.result.bound_status,
-    },
-    'hasBeenInvited': true,
-    'svip_given': 365,
-    'is_vip': true,
-}
-
-$done({ body: JSON.stringify(body) });
+const body = $response.body
+    .replace(/xy_vip_expire":\d+/g, 'xy_vip_expire":0')
+    .replace(/svip_expired_at":\d+/g, 'svip_expired_at":32494698549.41677')
+    .replace(/is_xy_vip":\w+/g, 'is_xy_vip":true')
+    .replace(/is_vip":\w+/g, 'is_xy_vip":true')
+    .replace(/xy_svip_expire":\d+/g, 'xy_svip_expire":2061894341')
+    .replace(/vip_type":".*?"/g, 'vip_type":"s"');
+$done({ body });
