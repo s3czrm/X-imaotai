@@ -10,33 +10,31 @@
 0 9,15 * * * https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/hlbdy.js, tag=黑料不打烊
 
 ******************************************/
-const scriptNmae = '黑料不打烊';
-const $ = Env(scriptNmae);
+const scriptName = '黑料不打烊';
+const $ = Env(scriptName);
 !(async () => {
     const url = await getNewUrl();
     const hotList = await getHotList(url);
     const msg = hotList.map(item => `【${item.title}(${item.date})】\n${item.link}\n`).join('');
-    $.msg(scriptNmae, '最新黑料', msg, { "media-url": url + '/static/pc/icons/icon_512x512.820c9b.png?v=1' });
+    $.msg(scriptName, '最新黑料', msg, { "media-url": url + '/static/pc/icons/icon_512x512.820c9b.png?v=1' });
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done());
 // 获取最新地址
 async function getNewUrl() {
-    const navUrl = $.isNode() ? 'https://hl03.co' /* 最新域名 */ : 'https://155.fun'; /* 最新域名 */
+    const navUrl = $.isNode() ? 'https://hl03.co' /* 最新域名 */ : 'https://155.fun'; /* 永久域名 */
     return new Promise(async (resolve, reject) => {
-        try {
-            const html = (await $.http.get({ url: navUrl })).body.replace(/\n|\s|\r/g, '');
-            const boxWrap = html.match(/<divclass="box-wrap">.*?<\/div>/)[0];
-            const aTag = boxWrap.match(/<ahref=".*?">.*?<\/a>/g);
-            const linkList = aTag.map(item => {
-                let link = item.match(/<ahref="(.*?)">/)[1];
-                const title = item.match(/<ahref=".*?">(.*?)<\/a>/)[1];
-                if (title.includes('线路')) return link;
-            }).filter(Boolean);
-            resolve(linkList[0]);
-        } catch (e) {
-            reject(e)
-        }
+        $.http.get({ url: navUrl }).then(({ body: html }) => {
+            const linkList = html.replace(/\n|\s|\r/g, '')
+                .match(/<divclass="box-wrap">.*?<\/div>/)[0]
+                .match(/<ahref=".*?">.*?<\/a>/g)
+                .map(item => {
+                    let link = item.match(/<ahref="(.*?)">/)[1];
+                    const title = item.match(/<ahref=".*?">(.*?)<\/a>/)[1];
+                    if (title.includes('线路')) return link;
+                }).filter(Boolean)[0];
+            resolve(linkList);
+        }).catch(err => reject(err))
     })
 }
 // 获取热门列表
@@ -83,9 +81,8 @@ async function getPublishDate(url) {
     })
 }
 /**
- * 获取相差天数
+ * 获取时间差
  * @param {*} date YYYY/MM/DD
- * @returns {Number} days
  */
 function getDiff(date) {
     const now = new Date().getTime();
