@@ -14,17 +14,14 @@ hostname = 91porn.com
 ^http[s]?:\/\/91porn\.com\/show_comments2\.php\?VID=\d+ url script-response-body https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/91porn.js
 
 ******************************************/
-const $ = new Env('91');
+const scriptName = '91porn';
+const $ = new Env(scriptName);
 const id = $request.url.match(/VID=(\d+)/)[1];
 const checkM3u8 = (url) => {
     return new Promise((resolve, reject) => {
-        $.get({ url }, (err, resp, body) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(body)
-            }
-        })
+        $.http.get(url)
+            .then(() => { resolve(true) })
+            .catch((err) => { reject(err || '网络请求失败') })
     })
 }
 const domainList = [
@@ -39,9 +36,9 @@ domainList.map(async (domain) => {
     try {
         const res = await checkM3u8(url)
         if (res) {
-            const _url = `https://m.auok.run/player/#${url}`
-            $.msg('解析成功', '', '', { 'open-url': _url })
-            $done({})
+            // const _url = `https://m.auok.run/player/#${url}`;
+            $.msg('解析成功', '', '', { 'open-url': url });
+            $.done();
         }
     } catch (err) {
         console.log(err)
