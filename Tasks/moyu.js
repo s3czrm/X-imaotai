@@ -34,6 +34,7 @@ const festivalList = [
 let holidayList = [];
 !(async () => {
     await handleFestival();
+    await $.wait(500)
     await toNotify();
 })()
     .catch((e) => $.logErr(e))
@@ -70,19 +71,21 @@ function toNotify() {
         }
         let content = `【${month}月${day}日${timeFrame}】`
         content += "\n生活不止眼前的苟且，还有诗和远方，还有摸🐟的快乐。";
-        const _almanac = await getPermanentCalendarFromITiki();
+        const _almanac = await getPermanentCalendar();
         if (_almanac) {
             content += '\n【今日黄历】'
-            content += "\n农历" + _almanac["nonglicn"]
-            content += "\n[宜]" + _almanac["suit"]
-            content += "\n[忌]" + _almanac["avoid"]
+            content += "\n[农]" + _almanac["lunar"]
+            content += "\n[势]" + _almanac["lunarGanZhi"]
+            _almanac["festivals"]?.length && (content += "\n[节]" + _almanac["festivals"].map(item => `【${item}】`).join(""))
+            content += "\n[宜]" + _almanac["suit"].map(item => item?.desc ? `${item.name(item.desc)}` : `${item.name}`).join(" ")
+            content += "\n[忌]" + _almanac["avoid"].map(item => item?.desc ? `${item.name(item.desc)}` : `${item.name}`).join(" ")
         }
         const weeekend = getRemainDays(getWeekend());
         content += '\n【快乐周末】'
-        if (weeekend > 0) {
+        if (weeekend > 0 && weeekend < 6) {
             content += `\n距离周末还有${weeekend}天`
         } else {
-            content += `\n今天就是周末啦，快去摸鱼吧~`
+            content += `\n今天就是周末呀，快去摸鱼吧~`
         }
         content += '\n【节日预警】'
         if (holidayList.length > 0) {
@@ -145,22 +148,67 @@ function isLeapYear(Year) {
     } else { return (false); }
 }
 /**
- * 万年历接口
- * @author https://gitee.com/iTiki/holidays_api/
+ * 万年历爬取
+ * @site https://wannianrili.bmcx.com
+ * @description 获取一个月黄历|使用持久化存储
+ * @author 𝒀𝒖𝒉𝒆𝒏𝒈
+ * @createDate 2023-06-26
+ * @returns 今日黄历
  */
-function getPermanentCalendarFromITiki() {
+function getPermanentCalendar() {
     return new Promise(async (resolve, reject) => {
-        const _month = month < 10 ? '0' + month : month;
-        const _day = day < 10 ? '0' + day : day;
-        const dateStr = `${year}${_month}${_day}`
-        const url = `https://tool.bitefu.net/jiari/?info=1&d=${dateStr}`;
-        try {
-            const { body } = await request.get(url);
-            const todayMap = JSON.parse(body);
-            resolve(todayMap);
-        } catch (e) {
-            reject('获取万年失败');
+        const dataName = `moyu_${year}${month}`;
+        const data = $.getdata(dataName) || '[]';
+        let dataArr = JSON.parse(data);
+        if (!dataArr.length) {
+            const _month = month < 10 ? '0' + month : month;
+            const _day = day < 10 ? '0' + day : day;
+            const dateStr = `${year}-${_month}-${_day}`;
+            const url = `https://wannianrili.bmcx.com/${dateStr}__wannianrili/`;
+            try {
+                const { body: html } = await request.get(url);
+                const htmlArr = html
+                    .match(/<div class="wnrl_k_you".*>([\s\S]*?)<\/div><div class="wnrl_k_xia_id"/)[0]
+                    .split('<div class="wnrl_k_xia_id"')[0]
+                    .split(/<div class="wnrl_k_you" id="wnrl_k_you_id_/)
+                    .filter(Boolean)
+                    .map(item => {
+                        const [, date = ''] = item.match(/<div class="wnrl_k_you_id_biaoti">([\s\S]*?)<\/div>/) || ['', ''];
+                        const [, day = ''] = item.match(/<div class="wnrl_k_you_id_wnrl_riqi">([\s\S]*?)<\/div>/) || ['', ''];
+                        const [, lunar = ''] = item.match(/<div class="wnrl_k_you_id_wnrl_nongli">([\s\S]*?)<\/div>/) || ['', ''];
+                        const [, lunarGanZhi = ''] = item.match(/<div class="wnrl_k_you_id_wnrl_nongli_ganzhi">([\s\S]*?)<\/div>/) || ['', ''];
+                        const [, festivalList = ''] = item.match(/<span class="wnrl_k_you_id_wnrl_jieri_neirong">([\s\S]*?)<\/span>/) || ['', ''];
+                        const festivals = festivalList.match(/<a.*?>(.*?)<\/a>/g)?.map((item) => item.match(/<a.*?>(.*?)<\/a>/)[1]) || [];
+                        const [, suitList = ''] = item.match(/<div class="wnrl_k_you_id_wnrl_yi">([\s\S]*?)<\/div>/) || ['', ''];
+                        const suit = suitList.match(/<a.*?>(.*?)<\/a>/g)?.map((item) => {
+                            const [, name, desc] = item.match(/<a.*?>(.*?)<\/a>/);
+                            return { name, desc };
+                        }) || [];
+                        const [, avoidList = ''] = item.match(/<div class="wnrl_k_you_id_wnrl_ji">([\s\S]*?)<\/div>/) || ['', ''];
+                        const avoid = avoidList.match(/<a.*?>(.*?)<\/a>/g)?.map((item) => {
+                            const [, name, desc] = item.match(/<a.*?>(.*?)<\/a>/);
+                            return { name, desc };
+                        }) || [];
+                        return {
+                            date,
+                            day,
+                            lunar,
+                            lunarGanZhi,
+                            festivals,
+                            suit,
+                            avoid,
+                        };
+                    });
+                $.setdata(JSON.stringify(htmlArr), `moyu_${year}${month}`);
+                const prevDataName = `moyu_${year}${month - 1}`;
+                if ($.getdata(prevDataName)) $.setdata('', prevDataName);
+                dataArr = htmlArr;
+            } catch (e) {
+                reject(e || '获取黄历失败');
+            }
         }
+        const today = dataArr.find((item) => +item.day === day);
+        resolve(today);
     })
 }
 /**
