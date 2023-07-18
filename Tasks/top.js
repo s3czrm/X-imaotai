@@ -8,10 +8,11 @@
 ******************************************
 
 [task_local]
-30 6-23 * * * https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/top.js, tag=热搜榜单
+30 6-23 * * * https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/top.js, tag=热搜聚合, img-url=https://is3-ssl.mzstatic.com/image/thumb/Purple126/v4/9a/d8/77/9ad877c6-e3d7-61a1-3911-5036239a41a6/AppIcon-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/144x144bb.png, enabled=true
 
 [Script]
-cron "30 6-23 * * *" script-path=https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/top.js, timeout=10, tag=热搜榜单
+cron "30 6-23 * * *" script-path=https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/top.js, timeout=10, tag=热搜聚合, argument="https://is3-ssl.mzstatic.com/image/thumb/Purple126/v4/9a/d8/77/9ad877c6-e3d7-61a1-3911-5036239a41a6/AppIcon-1x_U007emarketing-0-7-0-0-sRGB-85-220.png/144x144bb.png"
+
 
 ******************************************/
 const scriptName = '热搜榜'
