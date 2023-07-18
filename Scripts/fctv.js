@@ -1,10 +1,13 @@
 /******************************************
- * @name 发财TV
- * @desc 逆向解锁VIP
- * @statement 仅供学习交流，禁止用于商业用途
- * @author yuheng
- * @create 20230508
- * @version 1.0.0
+ * @name 发财TV🚗
+ * @description 解锁会员视频|开发摆烂去了加密🔐
+ * @statement 仅供学习交流|禁止用于商业用途|违者后果自负|
+              转载请注明来源|欢迎分享|拒绝倒卖|倒卖🐕必死🐎
+ * @channel https://t.me/yqc_123
+ * @group https://t.me/yqc_777
+ * @author 𝒀𝒖𝒉𝒆𝒏𝒈
+ * @update 20230718
+ * @version 1.0.1
  * @url https://fctv111.com
  *      https://fctv222.com
  *      https://fctv333.com
@@ -18,5 +21,15 @@ hostname = mdapi.zhbt01.com
 ^https:\/\/mdapi\.zhbt01\.com\/api\/video\/user\/info url script-response-body https://raw.githubusercontent.com/Yuheng0101/X/main/Scripts/fctv.js
 
 ******************************************/
-const body = $response.body.replace(/\"data":".*?"/g, '\"data":"9+5b72ccLbOPx2AJ/rMwnKpXuWH6Ns39y6bzAQCotxtsbybXvhBolmVn4UMkVUZNuLhSOeYbAyGBUBQXib1diLaRR3S5acnWsH3E1rjOths3bkCFMN7f0Br6TNfB9z0dbo10jIjzegjj1nJXQ79lucvV2ZxSxKziSx0t9avW0gN9UCAn85XVWKx6fOleCX4S/fnV9zK3H5W5m6JYIn8O6LD1ztalY434UkEfRTNlqdx/iG76fIZLfX7Ebi4n39Cw1R8gi9PnIzgEpuIlsVq0SA=="');
-$done({ body });
+let { body } = $response
+    , obj = JSON.parse(body)
+if (obj?.data) {
+    obj.data = {
+        ...obj.data,
+        end_time: '2099-01-01',
+        level: 3,
+        is_end: 1,
+        look_end: 0,
+    }
+}
+$done({ body: JSON.stringify(obj) })
