@@ -6,7 +6,7 @@ if (typeof $request === "object") {
     const { url } = $request
         , gameNameMatch = url.match(/games\/(\d+)-(.*)/)
     if (gameNameMatch) {
-        const gameName = gameNameMatch[2].replace(/-/g, '+').replace(/\?/g, '')
+        const gameName = gameNameMatch[2].replace(/-/g, '+').replace(/\?.*/g, '')
             , name = gameName.replace(/\+/g, ' ')
             , index = followedList.findIndex(item => item === gameName)
         if (index === -1) {
