@@ -1,18 +1,16 @@
 ## 干毛的?
 一个switch游戏打折监控脚本
 ## 食用方法
-  * 打开重写规则脚本(getGames.js)
+  * 打开重写规则脚本(eshop.conf)
   * 进入官网点击<span style="color:#87CEFA;">游戏详情页面</span>关注该游戏
   * 关闭脚本
   * 运行Task脚本(eshop.js)
 ## 配置 (QuanX)
 
 ```properties
-[MITM]
-hostname = eshop-price*
 
-[rewrite_local]
-^http[s]:\/\/eshop-prices\.com\/games url script-request-header https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/eshop/getGames.js
+[rewrite_remote]
+https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/eshop/eshop.conf, update-interval=172800, opt-parser=true, enabled=true
 
 [task_local]
 30 7 * * * https://raw.githubusercontent.com/Yuheng0101/X/main/Tasks/eshop/eshop.js, tag=eshop打折监控, enabled=true
