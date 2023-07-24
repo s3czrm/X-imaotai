@@ -3,8 +3,8 @@
  * @description eshop打折监控, 详细见readme
  * @channel https://t.me/yqc_123
  * @author 𝒀𝒖𝒉𝒆𝒏𝒈
- * @update 20230722
- * @version 1.0.0
+ * @update 20230724
+ * @version 1.0.1
 ******************************************/
 let scriptName = 'eshop打折监控'
     , $ = Env(scriptName)
@@ -37,10 +37,10 @@ let scriptName = 'eshop打折监控'
     .finally(() => $.done())
 function Main(name) {
     return new Promise((resolve, reject) => {
-        const url = baseURL + `/games?currency=CNY&q=${name}`
+        const url = baseURL + `/games?q=${name}`
         $.http.get(url).then(({ body }) => {
             let html = body.replace(/<h5>(.*?)<\/h5>/g, (_, p1) => `<h5>${p1.replaceAll(/\s/g, '&nbsp;')}</h5>`).replace(/[\s\n]/g, '')
-                , item = html.match(/games-listwell\">(.*?)<\/div><divclass=\"wrapper\">/g)[0]
+                , item = html.match(/<aclass=\"games-list-item\"(.*?)<\/a>/g)[0]
                 , link = baseURL + item.match(/href=\"(.*?)\"/)[1]
                 , thumb = item.match(/src=\"(.*?)\"/)[1]
                 , title = item.match(/h5>(.*?)<\/h5>/)[1].replace(/&nbsp;/g, ' ')
