@@ -64,7 +64,7 @@
             "id": "yuheng.imaotai",
             "name": "i茅台预约",
             "descs_html": [
-                "留空"
+                "<a target='_blank' href='https://github.com/Yuheng0101/X/tree/main/Tasks/imaotai'>README.md</a>"
             ],
             "keys": [
                 "imaotai__config__clearshopdir",
